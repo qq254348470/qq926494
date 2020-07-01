@@ -20,6 +20,7 @@ bool ULoadUserWidget::Initialize()
 	return true;
 }
 
+
 //加载完成更新UI事件
 void ULoadUserWidget::HiddenLoading()
 {

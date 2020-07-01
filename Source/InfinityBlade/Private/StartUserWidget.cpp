@@ -27,7 +27,7 @@ bool UStartUserWidget::Initialize()
 //退出按钮--点击事件
 void UStartUserWidget::QuitBtnOnClickedEvent()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("QuitBtn..."));
-	UKismetSystemLibrary::QuitGame(GetWorld(),nullptr,EQuitPreference::Quit);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("QuitBtn..."));
+	UKismetSystemLibrary::QuitGame(GetWorld(),nullptr,EQuitPreference::Quit,false);
 
 }

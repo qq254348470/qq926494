@@ -22,6 +22,9 @@ public:
 	TMap<FString,FString> ContextMap;
 	UPROPERTY()
 		ULoadUserWidget* LoadWidget;
+	//ip
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "IP")
+		FString IP;
 
 
 public:

@@ -8,12 +8,12 @@
 void AStartGameMode::BeginPlay()
 {
 	//初始化游戏开始界面
-	StartWidget = CreateWidget<UStartUserWidget>(GetGameInstance(), LoadClass<UStartUserWidget>(this, TEXT("WidgetBlueprint'/Game/UI/BP_StartWidget.BP_StartWidget_c'")));
+	StartWidget = CreateWidget<UStartUserWidget>(GetGameInstance(), LoadClass<UStartUserWidget>(this, TEXT("WidgetBlueprint'/Game/UI/Start/BP_StartWidget.BP_StartWidget_c'")));
 	StartWidget->AddToViewport();
 	//初始化游戏注册界面
-	RegisterWidget = CreateWidget<URegisterUserWidget>(GetGameInstance(), LoadClass<URegisterUserWidget>(this, TEXT("WidgetBlueprint'/Game/UI/BP_RegisterWidgt.BP_RegisterWidgt_c'")));
+	RegisterWidget = CreateWidget<URegisterUserWidget>(GetGameInstance(), LoadClass<URegisterUserWidget>(this, TEXT("WidgetBlueprint'/Game/UI/Start/BP_RegisterWidgt.BP_RegisterWidgt_c'")));
 	//初始化游戏登陆界面
-	LoginWidget = CreateWidget<ULoginUserWidget>(GetGameInstance(), LoadClass<ULoginUserWidget>(this, TEXT("WidgetBlueprint'/Game/UI/BP_LoginWidgt.BP_LoginWidgt_c'")));
+	LoginWidget = CreateWidget<ULoginUserWidget>(GetGameInstance(), LoadClass<ULoginUserWidget>(this, TEXT("WidgetBlueprint'/Game/UI/Start/BP_LoginWidgt.BP_LoginWidgt_c'")));
 	//游戏开始界面--登陆按钮点击事件
 	StartWidget->RegisterBtn->OnClicked.AddDynamic(this, &AStartGameMode::RegisterBtnOnClickedEvent);
 	//游戏开始界面--注册按钮点击事件

@@ -47,13 +47,29 @@ void ULoginUserWidget::LoginBtnOnClickedEvent()
 		return;
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 3.5f, FColor::Yellow, Nickname + "--" + Password);
+	GEngine->AddOnScreenDebugMessage(-1, 30.5f, FColor::Yellow, Nickname + "--" + Password);
 	//显示加载框
 	CircularThrobber->SetVisibility(ESlateVisibility::Visible);
 	//设置注册按钮不可用
 	LoginBtn->SetIsEnabled(false);
-	//注册界面--账号登陆方法
+	//注册界面--账号登陆方法=========================================================================================================================取消掉，无本地服务器
 	AccountRegisterFromServer(Nickname, Password);
+
+
+	//if (!Nickname.IsEmpty())
+	//{
+	//	//切换关卡
+	//	//MessageWidget->ShowTipEvent(Msg);
+	//	UCustomGameInstance* GameInstance = Cast<UCustomGameInstance>(GetWorld()->GetGameInstance());
+	//	//GameInstance->ContextMap.Add("id", Id);
+	//	UGameplayStatics::OpenLevel(GetWorld(), TEXT("/Game/Map/Map_Main"));
+	//}
+	//else
+	//{
+	//	//MessageWidget->ShowTipEvent(Msg);
+
+	//}
+
 }
 
 //登陆界面--账号登陆方法
@@ -66,29 +82,42 @@ void ULoginUserWidget::AccountRegisterFromServer(FString& Nickname, FString& Pas
 	//开始写入数据
 	JsonWriter->WriteObjectStart();
 	//写入昵称,秘密
-	JsonWriter->WriteValue("nickname", Nickname);
+	FString state = "App.User.LoginExt";
+	FString appkey = "6CBB3583DB7FC177B4E71DF7C1EE24CD";
+	FString signurl = "F341E6442FE605AF63F063FCCCE51251";
+	JsonWriter->WriteValue("s",state );
+	JsonWriter->WriteValue("username", Nickname);
 	JsonWriter->WriteValue("password", Password);
+	JsonWriter->WriteValue("is_allow_many", 1);
+	JsonWriter->WriteValue("app_key", appkey);
+	JsonWriter->WriteValue("sign", signurl);
 	//关闭Json写入
 	JsonWriter->WriteObjectEnd();
 	//关闭Json写入器
 	JsonWriter->Close();
-	GEngine->AddOnScreenDebugMessage(-1, 3.5f, FColor::Yellow, RegisterInfo);
+	GEngine->AddOnScreenDebugMessage(-1, 30.5f, FColor::Yellow, RegisterInfo);
 
 	//创建HTTP请求
 	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
 	//设置请求方式
 	HttpRequest->SetVerb("POST");
+	
+	FString url = "http://hn216.api.yesapi.cn";
 	//设置请求头
 	HttpRequest->SetHeader("Content-Type", "application/json;charset=utf-8");
 	//设置请求的url
-	HttpRequest->SetURL("http://192.168.50.35:7900/user/login-user");
+	UCustomGameInstance* GameInstance = Cast<UCustomGameInstance>(GetWorld()->GetGameInstance());
+	HttpRequest->SetURL(url);
 	//设置上传的数据
 	HttpRequest->SetContentAsString(RegisterInfo);
 	//设置请求成功后委托方法
 	HttpRequest->OnProcessRequestComplete().BindUObject(this, &ULoginUserWidget::RequestComplete);
 	//请求服务器
 	HttpRequest->ProcessRequest();
+	UE_LOG(LogTemp, Warning, TEXT("开始登陆……"))
 }
+
+
 //请求响应方法
 void ULoginUserWidget::RequestComplete(FHttpRequestPtr RequestPtr, FHttpResponsePtr ResponsePtr, bool bIsSuccess)
 {
@@ -112,31 +141,28 @@ void ULoginUserWidget::RequestComplete(FHttpRequestPtr RequestPtr, FHttpResponse
 	//判断是否解析成功
 	if (bIsParse)
 	{
-		//获取返回数据的msg
-		FString Msg = JsonObject->GetStringField("msg");
+		
 		//获取返回数据的data
 		TSharedPtr<FJsonObject> JsonData = JsonObject->GetObjectField("data");
-		FString Id = JsonData->GetStringField("id");
-		FString Nickname = JsonData->GetStringField("nickname");
-		
-		
-		
-		
-		GEngine->AddOnScreenDebugMessage(-1, 3.5f, FColor::Yellow, Msg);
-	
+		FString err_code = JsonData->GetStringField("err_code");
+		//获取返回数据的msg
+		FString Msg = JsonData->GetStringField("err_msg");
 
-		if (!Nickname.IsEmpty())
+		GEngine->AddOnScreenDebugMessage(-1, 30.5f, FColor::Green, Msg);
+		
+		if (err_code =="0")
 		{
+			UE_LOG(LogTemp, Warning, TEXT("登陆成功……"));
 			//切换关卡
 			MessageWidget->ShowTipEvent(Msg);
 			UCustomGameInstance* GameInstance = Cast<UCustomGameInstance>(GetWorld()->GetGameInstance());
-			GameInstance->ContextMap.Add("id", Id);
+			GameInstance->ContextMap.Add("id", err_code);
 			UGameplayStatics::OpenLevel(GetWorld(), TEXT("/Game/Map/Map_Main"));
 		}
 		else 
 		{
 			MessageWidget->ShowTipEvent(Msg);
-			
+			UE_LOG(LogTemp, Warning, TEXT("%s……"),*Msg);
 		}
 
 	}

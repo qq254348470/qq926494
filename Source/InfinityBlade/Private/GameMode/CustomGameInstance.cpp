@@ -10,7 +10,7 @@ void UCustomGameInstance::Init()
 	//结束加载地图的委托
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UCustomGameInstance::PostLoadMap);
 	//初始化加载UI
-	LoadWidget = CreateWidget<ULoadUserWidget>(this,LoadClass<ULoadUserWidget>(this,TEXT("WidgetBlueprint'/Game/UI/BP_LoadWidget.BP_LoadWidget_c'")));
+	LoadWidget = CreateWidget<ULoadUserWidget>(this,LoadClass<ULoadUserWidget>(this,TEXT("WidgetBlueprint'/Game/UI/Start/BP_LoadWidget.BP_LoadWidget_c'")));
 
 }
 
@@ -22,6 +22,10 @@ void UCustomGameInstance::PreLoadMap(const FString& Map)
 	{
 		//创建一个屏幕加载属性对象
 		FLoadingScreenAttributes LoadingAttr;
+		//取消加载完成后自动跳转
+		LoadingAttr.bAutoCompleteWhenLoadingCompletes = false;
+		//任意键跳转
+		LoadingAttr.bMoviesAreSkippable = true;
 		//手动点击跳过加载
 		LoadingAttr.bWaitForManualStop = true;
 		//设置加载的Widget
@@ -42,6 +46,7 @@ void UCustomGameInstance::PostLoadMap(UWorld* World)
 bool UCustomGameInstance::GetLoadStatus()
 {	
 	return 	GetMoviePlayer()->IsLoadingFinished();
+
 
 }
 

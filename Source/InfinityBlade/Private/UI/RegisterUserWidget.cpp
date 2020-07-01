@@ -73,8 +73,14 @@ void URegisterUserWidget::AccountRegisterFromServer(FString& Nickname, FString& 
 	//开始写入数据
 	JsonWriter->WriteObjectStart();
 	//写入昵称,秘密
-	JsonWriter->WriteValue("nickname", Nickname);
-	JsonWriter->WriteValue("password",Password);
+	FString state = "App.User.RegisterExt";
+	FString appkey = "6CBB3583DB7FC177B4E71DF7C1EE24CD";
+	FString signurl = "8A657C2FB098860169F93A933BC247D7";
+	JsonWriter->WriteValue("s", state);
+	JsonWriter->WriteValue("username", Nickname);
+	JsonWriter->WriteValue("password", Password);
+	JsonWriter->WriteValue("app_key", appkey);
+	JsonWriter->WriteValue("sign", signurl);
 	//关闭Json写入
 	JsonWriter->WriteObjectEnd();
 	//关闭Json写入器
@@ -86,15 +92,19 @@ void URegisterUserWidget::AccountRegisterFromServer(FString& Nickname, FString& 
 	//设置请求方式
 	HttpRequest->SetVerb("POST");
 	//设置请求头
+	FString url = "http://hn216.api.yesapi.cn";
 	HttpRequest->SetHeader("Content-Type", "application/json;charset=utf-8");
 	//设置请求的url
-	HttpRequest->SetURL("http://192.168.50.35:7900/user/register-user");
+	UCustomGameInstance* GameInstance = Cast<UCustomGameInstance>(GetWorld()->GetGameInstance());
+	
+	HttpRequest->SetURL(url);
 	//设置上传的数据
 	HttpRequest->SetContentAsString(RegisterInfo);
 	//设置请求成功后委托方法
 	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URegisterUserWidget::RequestComplete);
 	//请求服务器
 	HttpRequest->ProcessRequest();
+	UE_LOG(LogTemp, Warning, TEXT("开始注册……"))
 }
 
 //请求响应方法
@@ -120,10 +130,23 @@ void URegisterUserWidget::RequestComplete(FHttpRequestPtr RequestPtr, FHttpRespo
 	//判断是否解析成功
 	if (bIsParse)
 	{
-		FString Status = JsonObject->GetStringField("status");
-		FString Msg = JsonObject->GetStringField("msg");
-		GEngine->AddOnScreenDebugMessage(-1, 3.5f, FColor::Yellow, Status);
-		MessageWidget->ShowTipEvent(Msg);
+		//获取返回数据的data
+		TSharedPtr<FJsonObject> JsonData = JsonObject->GetObjectField("data");
+		FString err_code = JsonData->GetStringField("err_code");
+		FString Msg = JsonData->GetStringField("err_msg");
+		if (err_code == "0")
+		{
+			UE_LOG(LogTemp, Warning, TEXT("注册成功……"));
+			MessageWidget->ShowTipEvent("注册成功");
+		}
+		else {
+		
+			UE_LOG(LogTemp, Warning, TEXT("%s……"), *Msg);
+			MessageWidget->ShowTipEvent(Msg);
+		}
+
+		
+		
 
 	}
 

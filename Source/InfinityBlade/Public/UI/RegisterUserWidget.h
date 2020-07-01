@@ -11,6 +11,7 @@
 #include "Runtime/Online/HTTP/Public/Interfaces/IHttpRequest.h"
 #include "Runtime/Online/HTTP/Public/HttpModule.h"
 #include "Runtime/Online/HTTP/Public/Interfaces/IHttpResponse.h"
+#include "CustomGameInstance.h"
 #include "RegisterUserWidget.generated.h"
 
 /**
@@ -43,6 +44,7 @@ public:
 	//信息提示框
 	UPROPERTY()
 		UMessageUserWidget* MessageWidget;
+	
 
 public: 
 	//控件初始化方法
